@@ -3,6 +3,9 @@
 
 #include <stdbool.h>
 
+#define DEFAULT_BUFFER_SIZE 250
+
+
 typedef enum {
     NORMAL,
     DEBUG,

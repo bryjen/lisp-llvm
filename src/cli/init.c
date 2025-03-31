@@ -9,7 +9,11 @@
 #include "actions.h"
 
 
-const char *toml_config_template =
+const char* file_template =
+    "(let [name \"World\"]\n"
+    "(println (str \"Hello from \" %s \"!\")))";
+
+const char* toml_config_template =
     "# Project metadata\n"
     "name = \"%s\"\n"
     "version = \"0.1.0\"\n"
@@ -33,9 +37,8 @@ get_abs_dir_path(const char *const dir_path, char** out_error) {
     char *abs_dir_path = malloc(_MAX_PATH);
 
     if (_fullpath(abs_dir_path, dir_path, _MAX_PATH) == NULL) {
-        const size_t buf_size = 100 * sizeof(char);
-        char *buf = malloc(buf_size);
-        sprintf_s(buf, buf_size, "\"%s\" is not a valid directory.", dir_path);
+        char *buf = malloc(DEFAULT_BUFFER_SIZE);
+        sprintf_s(buf, DEFAULT_BUFFER_SIZE, "\"%s\" is not a valid directory.", dir_path);
         *out_error = buf;
 
         free(abs_dir_path);
@@ -86,9 +89,8 @@ does_directory_contain_files(const char *const abs_dir_path) {
 bool
 assert_directory_contains_no_files(const char *const abs_dir_path, char** out_error) {
     if (does_directory_contain_files(abs_dir_path)) {
-        const size_t buf_size = 100 * sizeof(char);
-        char *buf = malloc(buf_size);
-        sprintf_s(buf, buf_size, "Cannot create a project at \"%s\", it is not empty.", abs_dir_path);
+        char *buf = malloc(DEFAULT_BUFFER_SIZE);
+        sprintf_s(buf, DEFAULT_BUFFER_SIZE, "Cannot create a project at \"%s\", it is not empty.", abs_dir_path);
         *out_error = buf;
 
         return true;
@@ -99,7 +101,7 @@ assert_directory_contains_no_files(const char *const abs_dir_path, char** out_er
 
 
 bool
-setup_dir(const char *const abs_dir_path, char** out_error) {
+assert_dir_is_suitable(const char *const abs_dir_path, char** out_error) {
     if (does_directory_exists(abs_dir_path)) {
         char *assertion_error = NULL;
         if (assert_directory_contains_no_files(abs_dir_path, &assertion_error)) {
@@ -108,9 +110,8 @@ setup_dir(const char *const abs_dir_path, char** out_error) {
         }
     } else {
         if (!CreateDirectoryA(abs_dir_path, NULL)) {
-            const size_t buf_size = 100 * sizeof(char);
-            char *buf = malloc(buf_size);
-            sprintf_s(buf, buf_size, "Cannot the directory \"%s\" with error code '%d'.", abs_dir_path, GetLastError());
+            char *buf = malloc(DEFAULT_BUFFER_SIZE);
+            sprintf_s(buf, DEFAULT_BUFFER_SIZE, "Cannot the directory \"%s\" with error code '%d'.", abs_dir_path, GetLastError());
             *out_error = buf;
             return false;
         }
@@ -122,20 +123,18 @@ setup_dir(const char *const abs_dir_path, char** out_error) {
 
 bool
 generate_sample_file(const char* const abs_dir_path, const char *const project_name, char** out_error) {
-    const size_t buf_size = 100 * sizeof(char);
-    char *file_contents = malloc(buf_size);
-    sprintf_s(file_contents, buf_size, "(let [name \"World\"]\n(println (str \"Hello from \" %s \"!\")))", project_name);
+    char *file_contents = malloc(DEFAULT_BUFFER_SIZE);
+    sprintf_s(file_contents, DEFAULT_BUFFER_SIZE, file_template, project_name);
 
-    char *file_path = malloc(buf_size);
-    sprintf_s(file_path, buf_size, "%s\\%s.clj", abs_dir_path, project_name);
-
+    char *file_path = malloc(DEFAULT_BUFFER_SIZE);
+    sprintf_s(file_path, DEFAULT_BUFFER_SIZE, "%s\\%s.clj", abs_dir_path, project_name);
 
     FILE *f = NULL;
     const errno_t err = fopen_s(&f, file_path, "w");
 
     if (err != 0 || !f) {
-        char *file_open_err = malloc(buf_size);
-        sprintf_s(file_open_err, buf_size, "Failed to generate the template file \"%s.clj\"", project_name);
+        char *file_open_err = malloc(DEFAULT_BUFFER_SIZE);
+        sprintf_s(file_open_err, DEFAULT_BUFFER_SIZE, "Failed to generate the template file \"%s.clj\"", project_name);
         *out_error = file_open_err;
 
         free(file_contents);
@@ -160,7 +159,6 @@ generate_sample_config_file(const char* const abs_dir_path, const char *const pr
 
     char *file_path = malloc(buf_size);
     sprintf_s(file_path, buf_size, "%s\\%s.toml", abs_dir_path, project_name);
-
 
     FILE *f = NULL;
     const errno_t err = fopen_s(&f, file_path, "w");
@@ -196,15 +194,15 @@ init_project(const InitArgs init_args, char** out_error) {
     }
 
     char *setup_dir_err = NULL;
-    if (!setup_dir(abs_dir_path, &setup_dir_err)) {
+    if (!assert_dir_is_suitable(abs_dir_path, &setup_dir_err)) {
         *out_error = setup_dir_err ? setup_dir_err : default_err_msg;
         free(abs_dir_path);
         return false;
     }
 
-    char *template_file_gen_err = NULL;
-    if (!generate_sample_file(abs_dir_path, init_args.projectName, &template_file_gen_err)) {
-        *out_error = template_file_gen_err ? template_file_gen_err : default_err_msg;
+    char *unsuitable_dir_err = NULL;
+    if (!generate_sample_file(abs_dir_path, init_args.projectName, &unsuitable_dir_err)) {
+        *out_error = unsuitable_dir_err ? unsuitable_dir_err : default_err_msg;
         free(abs_dir_path);
         return false;
     }
