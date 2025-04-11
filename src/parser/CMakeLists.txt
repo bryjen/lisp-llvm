@@ -2,6 +2,10 @@
 include(fetchcontent)
 project(parser C)
 
+set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+set(CMAKE_C_FLAGS_DEBUG "/Od /Zi /RTC1" CACHE STRING "" FORCE)
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "/DEBUG" CACHE STRING "" FORCE)
+
 set(AST_PROJ_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../ast")
 FetchContent_Declare(
         ast

@@ -73,8 +73,8 @@ typedef struct {
  * \brief
  */
 typedef struct {
-    const char* const source_text;
-    const Token* const tokens;
+    const char* source_text;
+    const Token* tokens;
     size_t num_tokens;
 } TokenStream;
 

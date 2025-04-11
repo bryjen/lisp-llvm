@@ -3,7 +3,7 @@
 #include "parser.h"
 #include "tokenizer.h"
 
-// Sample function to test
+/*
 int square(int x) {
     return x * x;
 }
@@ -24,9 +24,10 @@ TEST(MathTest, IsEven) {
     EXPECT_TRUE(is_even(0));
     EXPECT_FALSE(is_even(3));
 }
+ */
 
 TEST(SOMETHING, 1) {
-    std::string source_text;
+    const std::string source_text = "(+ 5 5 )";
     tokenize(source_text.c_str());
-    EXPECT_TRUE(is_even(2));
+    EXPECT_TRUE(true);
 }

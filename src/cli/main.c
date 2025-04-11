@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     if (err) {
         printf("%s\n", err);
     }
-/*
+
     struct arg_lit *verbose = arg_lit0("v", "verbose", "Enable verbose output");
     struct arg_int *count = arg_int0("n", "number", "<n>", "Number of iterations");
     struct arg_end *end = arg_end(20);
@@ -39,6 +39,5 @@ int main(int argc, char *argv[]) {
     printf("Number: %d\n", count->count ? count->ival[0] : 0);
 
     arg_freetable(argtable, sizeof(argtable) / sizeof(argtable[0]));
- */
     return 0;
 }

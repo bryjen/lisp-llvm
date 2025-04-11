@@ -53,5 +53,8 @@ dkms.conf
 
 # project related stuff
 .idea/
+.vs/
 cmake*/
 vcpkg_installed/
+
+out/
