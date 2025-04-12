@@ -2,10 +2,6 @@
 include(fetchcontent)
 project(parser_tests CXX)
 
-set(CMAKE_C_FLAGS_DEBUG "/Od /Zi /RTC1" CACHE STRING "" FORCE)
-set(CMAKE_CXX_FLAGS_DEBUG "/Od /Zi /RTC1" CACHE STRING "" FORCE)
-set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
-
 add_executable(parser_tests
         test_main.cpp)
 

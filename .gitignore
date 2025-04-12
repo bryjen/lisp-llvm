@@ -58,3 +58,6 @@ cmake*/
 vcpkg_installed/
 
 out/
+
+# ignore lsp helper file
+compile_commands.json

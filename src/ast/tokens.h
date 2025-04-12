@@ -53,6 +53,8 @@ typedef enum {
     TOKEN_KIND_STRING_KEYWORD,
 
     TOKEN_KIND_DEF_KEYWORD,
+
+    TOKEN_KIND_BAD_TOKEN,
 } TokenKind;
 
 
@@ -61,13 +63,20 @@ typedef enum {
  */
 typedef struct {
     TokenKind token_kind;
-    const char* const start_slice;
+
+    // 'full_' includes trivia
+    size_t full_start;
+    size_t full_length;
+
+    // excludes trivia
     size_t start;
     size_t length;
+
     size_t line;
     size_t column;
 } Token;
 
+char* token_tostr(const Token *token, const char *source_text);
 
 /**
  * \brief
